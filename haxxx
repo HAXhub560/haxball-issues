@@ -1,0 +1,28 @@
+const room = HBInit({
+  roomName: "dny",
+  maxPlayers: 8,
+  public: true,
+  token: "thr1.AAAAAGh0-72e1b431tISUw.rrqL-StLZWg"
+});
+
+room.setDefaultStadium("Big");
+room.setScoreLimit(5);
+room.setTimeLimit(4);
+
+room.onRoomLink = function(link) {
+  console.log("https://www.haxball.com/play?c=vbaACsU0pJA:", link);
+};
+
+room.onPlayerJoin = function(player) {
+  room.sendChat(`👋 Hoş geldin, ${player.name}!`);
+};
+
+room.onPlayerChat = function(player, message) {
+  if (message === "!ping") {
+    room.sendChat("🏓 pong!");
+  } else if (message === "!me") {
+    room.sendChat(`${player.name}, senin ID'n: ${player.id}`);
+  } else if (message === "!yardim") {
+    room.sendChat("📋 Komutlar: !ping, !me, !yardim");
+  }
+};
