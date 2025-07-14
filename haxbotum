@@ -1,0 +1,34 @@
+const room = HBInit({
+  roomName: "dny",
+  maxPlayers: 8,
+  public: true,
+  token: "thr1.AAAAAGh0-72e1b431tISUw.rrqL-StLZWg"
+});
+
+// Oda ayarları
+room.setDefaultStadium("Big");
+room.setScoreLimit(5);
+room.setTimeLimit(4);
+
+// Oda bağlantısını konsola yaz
+room.onRoomLink = function(link) {
+  console.log("https://www.haxball.com/play?c=vbaACsU0pJA:", link);
+};
+
+// Oyuncu giriş mesajı
+room.onPlayerJoin = function(player) {
+  room.sendChat(`👋 Hoş geldin, ${player.name}!`);
+};
+
+// Sohbet komutları
+room.onPlayerChat = function(player, message) {
+  const name = player.name;
+
+  if (message === "!ping") {
+    room.sendChat("🏓 pong!");
+  } else if (message === "!me") {
+    room.sendChat(`${name}, senin ID'n: ${player.id}`);
+  } else if (message === "!yardim") {
+    room.sendChat("📋 Komutlar: !ping, !me, !yardim");
+  }
+};
