@@ -1,0 +1,70 @@
+var room = HBInit({
+  roomName: "Ersin Aroyyo's room",
+  maxPlayers: 10,
+  public: false,
+  noPlayer: true
+});
+
+room.setDefaultStadium("Big");
+room.setScoreLimit(5);
+room.setTimeLimit(3); // dakika
+
+// Oyuncu renkleri
+const redColor = { b: 100, r: 255, g: 0 };
+const blueColor = { b: 255, r: 0, g: 0 };
+
+// Botları tutacağız
+let bots = [];
+
+// Basit AI: topa yönel ve vur
+function getDirection(player, ball) {
+  let dx = ball.x - player.x;
+  let dy = ball.y - player.y;
+  let magnitude = Math.sqrt(dx * dx + dy * dy);
+
+  if (magnitude === 0) return { x: 0, y: 0 };
+
+  return { x: dx / magnitude, y: dy / magnitude };
+}
+
+// Botları oluştur
+function spawnBots() {
+  for (let i = 0; i < 10; i++) {
+    let botName = `BOT ${i + 1}`;
+    let team = i < 5 ? 1 : 2; // İlk 5 Red, son 5 Blue
+    room.setPlayerAdmin(room.getPlayerList()[0].id, true); // ilk oyuncu admin olur
+    room.fakePlayer(botName); // Headless API'de yok ama demo için
+    setTimeout(() => {
+      let player = room.getPlayerList().find(p => p.name === botName);
+      if (player) {
+        room.setPlayerTeam(player.id, team);
+        bots.push(player.id);
+      }
+    }, 100);
+  }
+}
+
+// Her frame'de botları oynat
+room.onGameTick = function () {
+  let ball = room.getBallPosition();
+  bots.forEach(id => {
+    let player = room.getPlayerDiscProperties(id);
+    if (!player) return;
+    let dir = getDirection(player, ball);
+    let input = { x: 0, y: 0 };
+
+    input.x = dir.x > 0.1 ? 1 : dir.x < -0.1 ? -1 : 0;
+    input.y = dir.y > 0.1 ? 1 : dir.y < -0.1 ? -1 : 0;
+
+    room.setKeyState(id, (input.x === 1 ? 1 : input.x === -1 ? 4 : 0) | (input.y === 1 ? 2 : input.y === -1 ? 8 : 0));
+  });
+};
+
+// Başlarken botları oluştur
+room.onRoomLink = function () {
+  spawnBots();
+};
+
+
+
+
